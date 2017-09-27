@@ -1,4 +1,4 @@
-package numeric.excel;
+package numeric;
 
 import java.util.ArrayDeque;
 import java.util.Collections;

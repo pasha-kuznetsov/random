@@ -1,4 +1,4 @@
-package numeric.excel
+package numeric
 
 import spock.lang.Specification
 import spock.lang.Unroll
