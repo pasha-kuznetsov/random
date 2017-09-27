@@ -1,7 +1,6 @@
 package arrays;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 // Find all unique values of a sorted integer array

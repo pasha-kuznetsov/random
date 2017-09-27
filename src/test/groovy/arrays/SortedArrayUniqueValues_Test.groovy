@@ -12,5 +12,6 @@ class SortedArrayUniqueValues_Test extends Specification {
         where:
         array                          | unique
         [0, 1, 2, 3, 3, 4, 5, 5, 5, 6] | [0, 1, 2, 4, 6]
+        [0, 0, 2, 3, 3, 4, 5, 5, 6, 6] | [2, 4]
     }
 }
