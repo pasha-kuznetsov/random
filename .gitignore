@@ -1,0 +1,11 @@
+# hidden
+.*
+
+# except .gitignore et
+!.*ignore
+
+# generated files
+build/
+bin/
+gen/
+out/
