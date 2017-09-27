@@ -26,12 +26,10 @@ class StringCompression {
             char c = '\0';
             for (; i < str.length() && !Character.isDigit(str.charAt(i)); ++i)
                 sb.append(c = str.charAt(i));
-            StringBuilder nb = new StringBuilder();
+            int n = 0;
             for (; i < str.length() && Character.isDigit(str.charAt(i)); ++i)
-                nb.append(str.charAt(i));
-            if (nb.length() < 1)
-                continue;
-            for (int n = Integer.parseInt(nb.toString()); n > 1; n--)
+                n = n * 10 + str.charAt(i) - '0';
+            for (; n > 1; n--)
                 sb.append(c);
         }
         return sb.toString();

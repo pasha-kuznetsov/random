@@ -25,5 +25,6 @@ class StringCompression_Test extends Specification {
         compressed | decompressed
         'a3b3cc'   | 'aaabbbcc'
         'ab3c2'    | 'abbbcc'
+        'a10b13c2' | 'aaaaaaaaaabbbbbbbbbbbbbcc'
     }
 }
