@@ -7,14 +7,14 @@ class MostUsedWords_Test extends Specification {
 
     @Unroll
     def "test #text"() {
-        def code = new MostUsedWords()
+        def subject = new MostUsedWords()
 
         expect:
-        code.mostUsedWords(text.split(), n) == expected
+        subject.mostUsedWords(text.split(), n) == expected
 
         where:
         text                | n | expected
         ''                  | 3 | []
-        "a b aa aa b cc cc" | 2 | ['cc', 'aa']
+        "a b aa aa b cc cc" | 2 | ['cc', 'b']
     }
 }
