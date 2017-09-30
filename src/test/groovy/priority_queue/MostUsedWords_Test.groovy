@@ -1,5 +1,6 @@
-package strings
+package priority_queue
 
+import priority_queue.MostUsedWords
 import spock.lang.Specification
 import spock.lang.Unroll
 

@@ -1,4 +1,4 @@
-package strings;
+package priority_queue;
 
 import java.util.*;
 
