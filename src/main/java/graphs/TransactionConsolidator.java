@@ -6,99 +6,76 @@ import java.util.*;
 // Consolidate all these transactions to minimum number of possible transactions.
 // HINT: Consolidate transitive transactions along with similar transactions
 public class TransactionConsolidator {
-    private final Map<String, Entity> entities = new HashMap<>();
-    private final Set<Entity> payers = new HashSet<>();
+    private final Map<String, Payer> payers = new HashMap<>();
 
     TransactionConsolidator(List<Transaction> transactions) {
-        for (Transaction tr : transactions) {
-            Entity payer = getEntity(tr.payer);
-            Entity payee = getEntity(tr.payee);
-            addPayment(payer, payee, tr.amount);
-            payers.add(payer);
-        }
+        for (Transaction tr : transactions)
+            getPayer(tr.payer).addPayment(tr.payee, tr.amount);
     }
 
     public Collection<Transaction> consolidate() {
-        Queue<Entity> payers = new ArrayDeque<>(this.payers);
-        while (!payers.isEmpty()) {
-            Entity payer = payers.poll();
+        Queue<Payer> payersQueue = new ArrayDeque<>(payers.values());
+        while (!payersQueue.isEmpty()) {
+            Payer payer1 = payersQueue.poll();
 
-            Queue<Payment> payments = new ArrayDeque<>(payer.payments.values());
-            while (!payments.isEmpty()) {
-                Payment payment1 = payments.poll();
-                Entity payee = payment1.payee;
-                if (payment1.amount <= 0) continue;
+            Queue<Transaction> payments1 = new ArrayDeque<>(payer1.payments.values());
+            while (!payments1.isEmpty()) {
+                Transaction tr1 = payments1.poll();
+                Payer payer2 = payers.get(tr1.payee);
+                if (payer2 == null) continue;
 
-                Queue<Payment> nextPayments = new ArrayDeque<>(payee.payments.values());
-                while (!nextPayments.isEmpty()) {
-                    Payment payment2 = nextPayments.poll();
-                    Entity nextPayee = payment2.payee;
-                    if (payment2.amount <= 0) continue;
+                Queue<Transaction> payments2 = new ArrayDeque<>(payer2.payments.values());
+                while (!payments2.isEmpty() && tr1.amount > 0) {
+                    Transaction tr2 = payments2.poll();
 
-                    int newPayment = Math.min(payment1.amount, payment2.amount);
-
-                    if (payment1.amount > newPayment)
-                        payment1.amount -= newPayment;
-                    else
-                        payer.payments.remove(payee);
-
-                    if (payment2.amount > newPayment)
-                        payment2.amount -= newPayment;
-                    else
-                        payee.payments.remove(nextPayee);
-
-                    if (nextPayee != payer && addPayment(payer, nextPayee, newPayment))
-                        payments.add(payer.payments.get(nextPayee));
+                    int newPayment = Math.min(tr1.amount, tr2.amount);
+                    payer1.subtractPayment(tr1, newPayment);
+                    payer2.subtractPayment(tr2, newPayment);
+                    if (!payer1.name.equals(tr2.payee) && payer1.addPayment(tr2.payee, newPayment))
+                        payments1.add(payer1.payments.get(tr2.payee));
                 }
             }
-
-            if (payer.payments.isEmpty())
-                this.payers.remove(payer);
         }
 
         List<Transaction> transactions = new ArrayList<>();
-        for (Entity payer : this.payers) {
-            for (Payment payment : payer.payments.values()) {
-                Transaction tr = new Transaction();
-                tr.payer = payer.name;
-                tr.payee = payment.payee.name;
-                tr.amount = payment.amount;
-                transactions.add(tr);
-            }
-        }
+        for (Payer payer : payers.values())
+            transactions.addAll(payer.payments.values());
         return transactions;
     }
 
-    private Entity getEntity(String name) {
-        return entities.compute(name, (n, entity) -> entity != null ? entity : new Entity(name));
+    private Payer getPayer(String name) {
+        return payers.compute(name, (n, entity) -> entity != null ? entity : new Payer(name));
     }
 
-    private boolean addPayment(Entity payer, Entity payee, Integer amount) {
-        Payment payment = payer.payments.compute(payee, this::getPayment);
-        payment.amount += amount;
-        return payment.amount == amount;
-    }
-
-    private Payment getPayment(Entity payee, Payment payment) {
-        return payment != null ? payment : new Payment(payee);
-    }
-
-    static class Entity {
+    static class Payer {
         String name;
-        Map<Entity, Payment> payments = new HashMap<>();
-        Entity(String name) { this.name = name; }
-    }
+        Map<String, Transaction> payments = new HashMap<>();
 
-    static class Payment {
-        Entity payee;
-        int amount;
-        Payment(Entity payee) { this.payee = payee; }
+        Payer(String name) { this.name = name; }
+
+        boolean addPayment(String payee, Integer amount) {
+            Transaction payment = payments.compute(payee,
+                    (p, tr) -> tr != null ? tr : new Transaction(name, payee, 0));
+            payment.amount += amount;
+            return payment.amount == amount;
+        }
+
+        void subtractPayment(Transaction tr, int amount) {
+            tr.amount = tr.amount > amount ? tr.amount - amount : 0;
+            if (tr.amount <= 0) payments.remove(tr.payee);
+        }
     }
 
     static class Transaction {
-        String payee;
         String payer;
+        String payee;
         int amount;
+
+        Transaction(String payer, String payee, int amount) {
+            this.payer = payer;
+            this.payee = payee;
+            this.amount = amount;
+        }
 
         @Override
         public boolean equals(Object other) { return other instanceof Transaction && equals((Transaction) other); }

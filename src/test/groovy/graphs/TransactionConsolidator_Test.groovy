@@ -48,8 +48,8 @@ class TransactionConsolidator_Test extends Specification {
                 tran("Chase", "BoA", 132),
                 tran("BoA", "Wells", 100)
         ]            | [
-                tran("Chase", "Wells", 100),
-                tran("Chase", "BoA", 32)
+                tran("Chase", "BoA", 32),
+                tran("Chase", "Wells", 100)
         ]
 
         [
@@ -72,12 +72,12 @@ class TransactionConsolidator_Test extends Specification {
                 tran("Wells", "Chase", 548),
                 tran("Wells", "BoA", 872)
         ]            | [
-                tran("Chase", "BoA", 204),
-                tran("Wells", "BoA", 485)
+                tran("Wells", "BoA", 485),
+                tran("Chase", "BoA", 204)
         ]
     }
 
     private static TransactionConsolidator.Transaction tran(String payer, String payee, Integer amount) {
-        ["payee": payee, "amount": amount, "payer": payer] as TransactionConsolidator.Transaction
+        return new TransactionConsolidator.Transaction(payer, payee, amount)
     }
 }
