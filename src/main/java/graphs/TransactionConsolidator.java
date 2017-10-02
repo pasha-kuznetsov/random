@@ -47,7 +47,7 @@ public class TransactionConsolidator {
         return payers.compute(name, (n, entity) -> entity != null ? entity : new Payer(name));
     }
 
-    static class Payer {
+    private static class Payer {
         String name;
         Map<String, Transaction> payments = new HashMap<>();
 
